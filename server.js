@@ -9,10 +9,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const USERS_FILE = path.join(__dirname, 'users.json');
 const EVENTS_FILE = path.join(__dirname, 'events.json');
-// Serve static files (for register.html and others)
-app.use(express.static(__dirname));
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+app.get('/register.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'register.html'));
+});
+app.get('/payment.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'payment.html'));  // This serves the register.html from the root folder
 });
 
 app.use(bodyParser.json());
