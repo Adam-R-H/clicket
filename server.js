@@ -168,6 +168,4 @@ app.post('/users/delete', (req, res) => {
     res.json({ success: true });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports = app;
