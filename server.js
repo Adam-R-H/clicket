@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
@@ -16,6 +17,12 @@ app.get('/', (req, res) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cors({
+  origin: 'https://clicket-three.vercel.app/',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+}));
 
 // Helper to read users
 function readUsers() {
