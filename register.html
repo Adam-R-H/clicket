@@ -86,7 +86,7 @@
         msg.textContent = 'Passwords do not match.';
         return;
       }
-      const res = await fetch('https://clicket-production-ba96.up.railway.app/register', {
+      const res = await fetch('https://proud-passion-production.up.railway.app/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullname, username, email, password })
