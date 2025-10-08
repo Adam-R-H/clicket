@@ -211,6 +211,21 @@ app.post('/users/delete', (req, res) => {
     res.json({ success: true });
 });
 
+// Update user profile endpoint
+app.post('/users/update', (req, res) => {
+    const { username, fullname, email } = req.body;
+    if (!username || !fullname || !email) {
+        return res.status(400).json({ error: 'All fields required.' });
+    }
+    let users = readUsers();
+    let user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    user.fullname = fullname;
+    user.email = email;
+    writeUsers(users);
+    res.json({ success: true });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

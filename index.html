@@ -298,18 +298,6 @@
             <span class="icon">🎪</span>
             <span class="label">Events</span>
           </li>
-          <li class="sidebar-item" title="Menu 3">
-            <span class="icon">🎓</span>
-            <span class="label">Menu 3</span>
-          </li>
-          <li class="sidebar-item" title="Menu 4">
-            <span class="icon">🔗</span>
-            <span class="label">Menu 4</span>
-          </li>
-          <li class="sidebar-item" title="Menu 5">
-            <span class="icon">⚙️</span>
-            <span class="label">Menu 5</span>
-          </li>
           <!-- Admin menu, hidden by default -->
           <li class="sidebar-item" data-section="admin" title="Admin" id="admin-menu" style="display:none;">
             <span class="icon">🛡️</span>
@@ -441,6 +429,7 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
+          setCurrentUser({ fullname: data.fullname, username, email: data.email, role: data.role });
           document.getElementById('user-name').textContent = data.fullname || username;
           if (data.role && data.role.toLowerCase() === 'admin') {
             document.getElementById('admin-menu').style.display = '';
@@ -568,7 +557,7 @@
     // Dropdown menu actions
     document.getElementById('edit-profile').addEventListener('click', function(e) {
       e.preventDefault();
-      alert('Edit Profile clicked!');
+      showEditProfileModal();
     });
     document.getElementById('logout').addEventListener('click', function(e) {
       e.preventDefault();
@@ -788,8 +777,95 @@
         }).then(() => showAdminSection());
       }
     };
+    // --- Edit Profile Logic ---
+    let currentUser = null;
+    function setCurrentUser(user) {
+      currentUser = user;
+    }
+    function showEditProfileModal() {
+      const modal = document.getElementById('edit-profile-modal');
+      modal.style.display = 'flex';
+      // Fill fields
+      document.getElementById('edit-fullname').value = currentUser.fullname || '';
+      document.getElementById('edit-username').value = currentUser.username || '';
+      document.getElementById('edit-email').value = currentUser.email || '';
+      document.getElementById('edit-profile-message').textContent = '';
+      document.getElementById('save-profile-btn').disabled = true;
+      document.getElementById('save-profile-btn').style.opacity = '0.6';
+    }
+    function hideEditProfileModal() {
+      document.getElementById('edit-profile-modal').style.display = 'none';
+    }
+    ['edit-fullname','edit-email'].forEach(id => {
+      document.getElementById(id).addEventListener('input', function() {
+        const fullname = document.getElementById('edit-fullname').value;
+        const email = document.getElementById('edit-email').value;
+        const changed = fullname !== currentUser.fullname || email !== currentUser.email;
+        const btn = document.getElementById('save-profile-btn');
+        btn.disabled = !changed;
+        btn.style.opacity = changed ? '1' : '0.6';
+      });
+    });
+    document.getElementById('edit-profile').addEventListener('click', function(e) {
+      e.preventDefault();
+      showEditProfileModal();
+    });
+    document.getElementById('close-profile-btn').addEventListener('click', function() {
+      hideEditProfileModal();
+    });
+    document.getElementById('edit-profile-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const fullname = document.getElementById('edit-fullname').value;
+      const email = document.getElementById('edit-email').value;
+      const username = document.getElementById('edit-username').value;
+      const btn = document.getElementById('save-profile-btn');
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      const res = await fetch('https://proud-passion-production.up.railway.app/users/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, fullname, email })
+      });
+      const data = await res.json();
+      const msg = document.getElementById('edit-profile-message');
+      if (data.success) {
+        msg.style.color = '#080';
+        msg.textContent = 'Profile updated!';
+        currentUser.fullname = fullname;
+        currentUser.email = email;
+        document.getElementById('user-name').textContent = fullname;
+        setTimeout(hideEditProfileModal, 1200);
+      } else {
+        msg.style.color = '#d00';
+        msg.textContent = data.error || 'Update failed.';
+      }
+    });
   </script>
-</body>
+<!-- Edit Profile Modal -->
+<div id="edit-profile-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:999;align-items:center;justify-content:center;">
+  <div class="center-container" style="min-width:320px;max-width:350px;">
+    <h2>Edit Profile</h2>
+    <form id="edit-profile-form">
+      <div>
+        <label for="edit-fullname">Full Name:</label>
+        <input type="text" id="edit-fullname" required>
+      </div>
+      <div>
+        <label for="edit-username">Username:</label>
+        <input type="text" id="edit-username" required readonly style="background:#eee;">
+      </div>
+      <div>
+        <label for="edit-email">Email:</label>
+        <input type="email" id="edit-email" required>
+      </div>
+      <div>
+        <button type="submit" id="save-profile-btn" disabled style="opacity:0.6;">Save Changes</button>
+        <button type="button" id="close-profile-btn" style="margin-top:8px;">Cancel</button>
+      </div>
+    </form>
+    <div id="edit-profile-message"></div>
+  </div>
+</div>
   <script>
     document.getElementById('go-register').addEventListener('click', function() {
       window.location.href = 'https://clicket-three.vercel.app/register.html';
@@ -816,4 +892,5 @@
       }
     });
   </script>
+</body>
 </html>
