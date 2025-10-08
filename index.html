@@ -824,27 +824,34 @@
       document.getElementById('edit-profile-message').textContent = '';
       document.getElementById('save-profile-btn').disabled = true;
       document.getElementById('save-profile-btn').style.opacity = '0.6';
-    }
-    function hideEditProfileModal() {
-      document.getElementById('edit-profile-modal').style.display = 'none';
+      // Store original values for change detection
+      document.getElementById('edit-profile-form').dataset.originalFullname = currentUser.fullname || '';
+      document.getElementById('edit-profile-form').dataset.originalEmail = currentUser.email || '';
     }
     ['edit-fullname','edit-email'].forEach(id => {
       document.getElementById(id).addEventListener('input', function() {
         const fullname = document.getElementById('edit-fullname').value;
         const email = document.getElementById('edit-email').value;
-        const changed = fullname !== currentUser.fullname || email !== currentUser.email;
+        const form = document.getElementById('edit-profile-form');
+        const changed = fullname !== form.dataset.originalFullname || email !== form.dataset.originalEmail;
         const btn = document.getElementById('save-profile-btn');
         btn.disabled = !changed;
         btn.style.opacity = changed ? '1' : '0.6';
       });
     });
-    document.getElementById('edit-profile').addEventListener('click', function(e) {
-      e.preventDefault();
-      showEditProfileModal();
-    });
     document.getElementById('close-profile-btn').addEventListener('click', function() {
       hideEditProfileModal();
     });
+    // Add back button
+    if (!document.getElementById('back-profile-btn')) {
+      const backBtn = document.createElement('button');
+      backBtn.id = 'back-profile-btn';
+      backBtn.type = 'button';
+      backBtn.textContent = 'Back';
+      backBtn.style.marginTop = '8px';
+      backBtn.onclick = function() { hideEditProfileModal(); };
+      document.getElementById('edit-profile-form').appendChild(backBtn);
+    }
     document.getElementById('edit-profile-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       const fullname = document.getElementById('edit-fullname').value;
