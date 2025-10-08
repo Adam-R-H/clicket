@@ -716,25 +716,58 @@
         });
     }
     function renderAdminUserList(users) {
-  let html = `<div style="max-width:1100px;width:96vw;margin:0 auto;">
+      let html = `<div style="max-width:1100px;width:96vw;margin:0 auto;">
         <h2 style="text-align:center;">User Management</h2>
-  <div style="max-height:400px;overflow-y:auto;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-radius:8px;background:#fff;padding:24px 32px 24px 32px;">
+        <div style="margin-bottom:18px;display:flex;align-items:center;justify-content:flex-start;gap:12px;">
+          <input id="user-search-input" type="text" placeholder="Search..." style="padding:8px 12px;border-radius:6px;border:1px solid #b0b8c1;font-size:1em;width:220px;">
+          <span style="font-size:1em;">Search by:</span>
+          <select id="user-search-type" style="padding:7px 10px;border-radius:6px;border:1px solid #b0b8c1;font-size:1em;">
+            <option value="fullname">Full Name</option>
+            <option value="username">Username</option>
+            <option value="id">ID</option>
+          </select>
+          <button id="user-search-btn" style="padding:7px 18px;border-radius:6px;background:#254a78;color:#fff;border:none;font-size:1em;">Search</button>
+        </div>
+        <div style="max-height:400px;overflow-y:auto;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-radius:8px;background:#fff;padding:24px 32px 24px 32px;">
           <table style="width:100%;border-collapse:collapse;">
-              <thead><tr style="background:#f4f6f8;">
-                <th style="padding:8px 4px;min-width:40px;">ID</th>
-                <th style="padding:8px 4px;min-width:160px;">Full Name</th>
-                <th style="min-width:100px;">Username</th>
-                <th style="min-width:220px;">Email</th>
-                <th style="min-width:70px;">Role</th>
-                <th style="min-width:180px;">Actions</th>
-              </tr></thead>
-            <tbody>`;
+            <thead><tr style="background:#f4f6f8;">
+              <th style="padding:8px 4px;min-width:40px;">ID</th>
+              <th style="padding:8px 4px;min-width:160px;">Full Name</th>
+              <th style="min-width:100px;">Username</th>
+              <th style="min-width:220px;">Email</th>
+              <th style="min-width:70px;">Role</th>
+              <th style="min-width:180px;">Actions</th>
+            </tr></thead>
+            <tbody id="user-table-body"></tbody>
+          </table>
+        </div>
+      </div>`;
+      document.getElementById('content-area').innerHTML = html;
+      renderUserTable(users);
+      document.getElementById('user-search-btn').onclick = function() {
+        const term = document.getElementById('user-search-input').value.trim().toLowerCase();
+        const type = document.getElementById('user-search-type').value;
+        let filtered = users;
+        if (term) {
+          if (type === 'id') {
+            filtered = users.filter(u => String(u.id) === term);
+          } else if (type === 'fullname') {
+            filtered = users.filter(u => (u.fullname||'').toLowerCase().includes(term));
+          } else if (type === 'username') {
+            filtered = users.filter(u => (u.username||'').toLowerCase().includes(term));
+          }
+        }
+        renderUserTable(filtered);
+      };
+    };
+    function renderUserTable(users) {
+      let html = '';
       users.forEach(user => {
         html += `<tr style="border-bottom:1px solid #eee;">
           <td style="padding:8px 4px;">${user.id !== undefined ? user.id : ''}</td>
           <td style="padding:8px 4px;">${user.fullname || ''}</td>
           <td>${user.username}</td>
-            <td style="min-width:220px;">${user.email}</td>
+          <td style="min-width:220px;">${user.email}</td>
           <td>${user.role}</td>
           <td>
             <button onclick="makeAdmin('${user.username}')" style="margin-right:8px;" ${user.role==='admin'?'disabled':''}>Make Admin</button>
@@ -742,8 +775,7 @@
           </td>
         </tr>`;
       });
-      html += '</tbody></table></div></div>';
-      document.getElementById('content-area').innerHTML = html;
+      document.getElementById('user-table-body').innerHTML = html;
     }
     window.makeAdmin = function(username) {
       if(confirm('Make ' + username + ' an admin?')) {
