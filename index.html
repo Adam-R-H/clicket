@@ -727,9 +727,10 @@
             <option value="id">ID</option>
           </select>
           <button id="user-search-btn" style="padding:7px 18px;border-radius:6px;background:#254a78;color:#fff;border:none;font-size:1em;">Search</button>
+          <button id="user-print-btn" style="padding:7px 18px;border-radius:6px;background:#1976d2;color:#fff;border:none;font-size:1em;">Print</button>
         </div>
         <div style="max-height:400px;overflow-y:auto;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-radius:8px;background:#fff;padding:24px 32px 24px 32px;">
-          <table style="width:100%;border-collapse:collapse;">
+          <table style="width:100%;border-collapse:collapse;" id="user-table-main">
             <thead><tr style="background:#f4f6f8;">
               <th style="padding:8px 4px;min-width:40px;">ID</th>
               <th style="padding:8px 4px;min-width:160px;">Full Name</th>
@@ -759,7 +760,24 @@
         }
         renderUserTable(filtered);
       };
-    };
+      document.getElementById('user-print-btn').onclick = function() {
+        // Get currently visible users from table
+        const rows = Array.from(document.getElementById('user-table-body').children);
+        let printHtml = `<html><head><title>Print Users</title><style>body{font-family:Arial,sans-serif;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #bbb;padding:8px;}th{background:#f4f6f8;}</style></head><body>`;
+        printHtml += '<h2>User List</h2>';
+        printHtml += '<table><thead><tr><th>ID</th><th>Full Name</th><th>Username</th><th>Email</th><th>Role</th></tr></thead><tbody>';
+        rows.forEach(row => {
+          const tds = row.querySelectorAll('td');
+          printHtml += `<tr><td>${tds[0].textContent}</td><td>${tds[1].textContent}</td><td>${tds[2].textContent}</td><td>${tds[3].textContent}</td><td>${tds[4].textContent}</td></tr>`;
+        });
+        printHtml += '</tbody></table></body></html>';
+        const win = window.open('', '', 'width=900,height=700');
+        win.document.write(printHtml);
+        win.document.close();
+        win.focus();
+        win.print();
+      };
+    }
     function renderUserTable(users) {
       let html = '';
       users.forEach(user => {
