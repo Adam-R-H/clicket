@@ -146,6 +146,37 @@ app.post('/events/add', (req, res) => {
     res.json({ success: true, message: 'Successfully added event' });
 });
 
+// Purchase tickets endpoint
+app.post('/tickets/purchase', (req, res) => {
+    const { eventId, quantity } = req.body;
+    if (!eventId || !quantity || quantity < 1) {
+        return res.status(400).json({ error: 'Event and valid quantity required.' });
+    }
+    let events = readEvents();
+    let event = events.find(e => String(e.id) === String(eventId) || e.name.toLowerCase() === String(eventId).toLowerCase());
+    if (!event) {
+        return res.status(404).json({ error: 'Event not found.' });
+    }
+    // Sort prices ascending
+    event.prices.sort((a, b) => a.price - b.price);
+    let qtyLeft = quantity;
+    let breakdown = [];
+    for (let p of event.prices) {
+        if (qtyLeft <= 0) break;
+        let take = Math.min(qtyLeft, p.stock);
+        if (take > 0) {
+            breakdown.push({ price: p.price, count: take });
+            p.stock -= take;
+            qtyLeft -= take;
+        }
+    }
+    if (qtyLeft > 0) {
+        return res.status(400).json({ error: 'Not enough tickets in stock.' });
+    }
+    writeEvents(events);
+    res.json({ success: true, breakdown });
+});
+
 // Admin: Get all users (no password)
 app.get('/users', (req, res) => {
     const users = readUsers();
