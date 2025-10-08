@@ -302,7 +302,7 @@
             <div style="position:relative;">
               <input type="password" id="password" autocomplete="current-password" required style="padding-right:90px;">
               <button type="button" id="toggle-password" aria-pressed="false" title="Show password" style="position:absolute;right:6px;top:6px;padding:6px;border:0;background:transparent;cursor:pointer;">
-                <img id="toggle-password-img" src="/assets/show.png" alt="Show password" style="width:18px;height:18px;display:block;">
+                <img id="toggle-password-img" src="assets/show.png" alt="Show password" style="width:18px;height:18px;display:block;">
               </button>
             </div>
           </div>
@@ -509,13 +509,13 @@
       const img = document.getElementById('toggle-password-img');
       if (pw.type === 'password') {
         pw.type = 'text';
-        img.src = '/assets/hide.png';
+        img.src = 'assets/hide.png';
         img.alt = 'Hide password';
         togglePasswordBtn.setAttribute('aria-pressed', 'true');
         togglePasswordBtn.title = 'Hide password';
       } else {
         pw.type = 'password';
-        img.src = '/assets/show.png';
+        img.src = 'assets/show.png';
         img.alt = 'Show password';
         togglePasswordBtn.setAttribute('aria-pressed', 'false');
         togglePasswordBtn.title = 'Show password';
